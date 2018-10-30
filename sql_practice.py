@@ -24,12 +24,12 @@ mycursor = mydb.cursor()
 # ORDER BY
 # DESC
 
-sql = "SELECT * FROM students ORDER BY name DESC"
+sql = "DROP TABLE IF EXISTS students"
 
 mycursor.execute(sql)
 
-myresult = mycursor.fetchall()
+# myresult = mycursor.fetchall()
 
-for row in myresult:
-    print(row)
-# mydb.commit()
+# for row in myresult:
+#     print(row)
+mydb.commit()
