@@ -16,10 +16,15 @@ mycursor = mydb.cursor()
 # CREATE
 # USE
 # SELECT
+# INSERT INTO
 # WHERE
 # LIKE
+# UPDATE
+# LIMIT
+# ORDER BY
+# DESC
 
-sql = "SELECT * FROM students WHERE name LIKE '%ac%'"
+sql = "SELECT * FROM students ORDER BY name DESC"
 
 mycursor.execute(sql)
 
@@ -27,3 +32,4 @@ myresult = mycursor.fetchall()
 
 for row in myresult:
     print(row)
+# mydb.commit()
