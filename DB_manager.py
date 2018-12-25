@@ -4,9 +4,8 @@ from datetime import datetime
 
 
 class DatabaseUtility:
-    def __init__(self, database, tableName):
+    def __init__(self, database):
         self.db = database
-        self.tableName = tableName
 
         p='madagascar'
         self.cnx = mysql.connector.connect(user='root',
@@ -15,7 +14,6 @@ class DatabaseUtility:
         self.cursor = self.cnx.cursor()
 
         self.ConnectToDatabase()
-        self.CreateTable()
 
     def ConnectToDatabase(self):
         try:
@@ -29,12 +27,12 @@ class DatabaseUtility:
 
     def CreateDatabase(self):
         try:
-            self.RunCommand("CREATE DATABASE %s DEFAULT CHARACTER SET 'utf8';" % self.db)
+            self.RunCommand("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8';".format(self.db))
         except mysql.connector.Error as err:
             print("Failed creating database: {}".format(err))
 
-    def CreateTable(self):
-        cmd = (" CREATE TABLE IF NOT EXISTS " + self.tableName + " ("
+    def CreateTable(self, tableName):
+        cmd = (" CREATE TABLE IF NOT EXISTS " + tableName + " ("
                                                                  " `ID` int(5) NOT NULL AUTO_INCREMENT,"
                                                                  " `date` date NOT NULL,"
                                                                  " `time` time NOT NULL,"
@@ -43,12 +41,12 @@ class DatabaseUtility:
                                                                  ") ENGINE=InnoDB;")
         self.RunCommand(cmd)
 
-    def GetTable(self):
-        self.CreateTable()
-        return self.RunCommand("SELECT * FROM %s;" % self.tableName)
+    def GetTable(self, tableName):
+        self.CreateTable(tableName)
+        return self.RunCommand("SELECT * FROM %s;" % tableName)
 
-    def GetColumns(self):
-        return self.RunCommand("SHOW COLUMNS FROM %s;" % self.tableName)
+    def GetColumns(self, tableName):
+        return self.RunCommand("SHOW COLUMNS FROM %s;" % tableName)
 
     def RunCommand(self, cmd):
         print("RUNNING COMMAND: " + cmd)
@@ -63,12 +61,17 @@ class DatabaseUtility:
             msg = self.cursor.fetchone()
         return msg
 
-    def AddEntryToTable(self, message):
+    def AddEntryToTable(self, tableName, message):
         date1 = datetime.now().strftime("%y-%m-%d")
         time = datetime.now().strftime("%H:%M")
 
-        cmd = " INSERT INTO " + self.tableName + " (date, time, message)"
+        cmd = " INSERT INTO " + tableName + " (date, time, message)"
         cmd += " VALUES ('%s', '%s', '%s' );" % (date1, time, message)
+        self.RunCommand(cmd)
+
+    def AddRecordToTable(self, tableName, data):
+        cmd = " INSERT INTO " + tableName + " (first_name, middle_name, last_name, sex, age)"
+        cmd += " VALUES ('%s', '%s', '%s', '%s', '%d');" % data
         self.RunCommand(cmd)
 
     def __del__(self):
@@ -81,10 +84,10 @@ if __name__ == '__main__':
     db = 'myFirstDB'
     tableName = 'test8'
 
-    dbu = DatabaseUtility(db, tableName)
+    dbu = DatabaseUtility(db)
 
-# dbu.AddEntryToTable ('testing')
-# dbu.AddEntryToTable ('testing2')
-# print (dbu.GetColumns())
-# print (dbu.GetTable())
+    print(dbu.GetColumns())
+# dbu.AddEntryToTable('testing')
+# dbu.AddEntryToTable('testing2')
+# print(dbu.GetTable())
 
