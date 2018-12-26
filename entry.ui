@@ -228,22 +228,6 @@
   <connection>
    <sender>clearPushButton</sender>
    <signal>clicked()</signal>
-   <receiver>ageSpinBox</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>892</x>
-     <y>107</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>831</x>
-     <y>93</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>clearPushButton</sender>
-   <signal>clicked()</signal>
    <receiver>lnameLineEdit</receiver>
    <slot>clear()</slot>
    <hints>

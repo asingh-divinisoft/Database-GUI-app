@@ -76,7 +76,8 @@ class DatabaseUtility:
     def Query(self, tableName, data):
         cmd = []
         for k in data:
-            cmd.append(k + " LIKE '" + data[k][0] + '_'*(len(data[k])-2) + data[k][-1] + "'")
+            cmd.append(k + " LIKE '" + data[k] + "%'")
+            # cmd.append(k + " LIKE '" + data[k][0] + '_'*(len(data[k])-2) + data[k][-1] + "'")
         cmd = "SELECT * FROM " + tableName + " WHERE " + " AND ".join(cmd) + ";"
 
         return self.RunCommand(cmd)

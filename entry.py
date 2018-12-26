@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThreadPool, QRunnable, QObject
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThread
+from queue import Queue
 
 import DB_manager
 
@@ -23,33 +24,78 @@ class App(QtWidgets.QWidget):
                        'age': self.ageSpinBox
                        }
 
-        self.inputs['sex'].addItems(['M', 'F'])
-        self.inputs['fname'].editingFinished.connect(self.fname_query)
-        self.submitPushButton.clicked.connect(self.Commit)
-        self.treeWidget.itemClicked.connect(self.printin)
-
-        self.threadpool = QThreadPool()
-        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
-
-        worker = DB_handler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.tableName)
-        worker.signals.result.connect(self.UpdateTree)
-        worker.signals.finished.connect(self.enableSubmitButton)
+        self.full_list_present = True
 
         self.submitPushButton.setEnabled(False)
-        self.threadpool.start(worker)
+        self.inputs['sex'].addItems(['Select', 'M', 'F'])
 
-        self.input_data = {}
+        self.clearPushButton.clicked.connect(self.reset_age)
+        self.clearPushButton.clicked.connect(self.reset_sex)
+        self.submitPushButton.clicked.connect(self.submit)
+        self.treeWidget.itemClicked.connect(self.printin)
+
+        self.inputs['fname'].textChanged.connect(self.query)
+        self.inputs['mname'].textChanged.connect(self.query)
+        self.inputs['lname'].textChanged.connect(self.query)
+        self.inputs['sex'].currentIndexChanged.connect(self.query)
+        self.inputs['age'].valueChanged.connect(self.query)
+
+        job = DBHandler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.tableName)
+        job.signals.result.connect(self.update_tree)
+        job.signals.finished.connect(self.enableSubmitButton)
+
+        self.qu = Queue()
+        worker = Worker(qu=self.qu, parent=self)
+
+        self.qu.put(job)
+        worker.start()
 
     @pyqtSlot()
-    def fname_query(self):
-        self.input_data['first_name'] = self.inputs['fname'].text()
-        if self.input_data['first_name'] is '':
-            return
-        worker2 = DB_handler(fn1=self.dbu.GetColumns, fn2=self.dbu.Query, tableName=self.tableName)
-        worker2.signals.result.connect(self.UpdateTree)
-        self.sig.connect(worker2.take_input)
-        self.sig.emit(self.input_data)
-        self.threadpool.start(worker2)
+    def reset_age(self):
+        self.inputs['age'].setValue(0)
+
+    @pyqtSlot()
+    def reset_sex(self):
+        self.inputs['sex'].setCurrentIndex(0)
+
+    @pyqtSlot()
+    def query(self):
+        input_data = {}
+        query_data = {}
+
+        input_data['first_name'] = self.inputs['fname'].text()
+        input_data['middle_name'] = self.inputs['mname'].text()
+        input_data['last_name'] = self.inputs['lname'].text()
+        input_data['sex'] = self.inputs['sex'].currentText()
+        input_data['age'] = str(self.inputs['age'].value())
+
+        if input_data['first_name'] != '':
+            query_data['first_name'] = input_data['first_name']
+
+        if input_data['middle_name'] != '':
+            query_data['middle_name'] = input_data['middle_name']
+
+        if input_data['last_name'] != '':
+            query_data['last_name'] = input_data['last_name']
+
+        if input_data['sex'] != 'Select':
+            query_data['sex'] = input_data['sex']
+
+        if input_data['age'] != '0':
+            query_data['age'] = input_data['age']
+
+        if len(query_data) > 0:
+            job2 = DBHandler(fn1=self.dbu.GetColumns, fn2=self.dbu.Query, tableName=self.tableName)
+            job2.signals.result.connect(self.update_tree)
+            self.sig.connect(job2.take_input)
+            self.sig.emit(query_data)
+            self.qu.put(job2)
+            self.full_list_present = False
+        elif not self.full_list_present:
+            job = DBHandler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.tableName)
+            job.signals.result.connect(self.update_tree)
+            self.qu.put(job)
+            self.full_list_present = True
 
     @pyqtSlot()
     def selectionchange(self):
@@ -65,7 +111,7 @@ class App(QtWidgets.QWidget):
         self.submitPushButton.setEnabled(True)
 
     @pyqtSlot()
-    def Commit(self):
+    def submit(self):
         self.submitPushButton.setEnabled(False)
         fname = self.inputs['fname'].text()
         mname = self.inputs['mname'].text()
@@ -73,13 +119,13 @@ class App(QtWidgets.QWidget):
         sex = self.inputs['sex'].currentText()
         age = self.inputs['age'].value()
         self.dbu.AddRecordToTable(self.tableName, (fname, mname, lname, sex, age))
-        worker = DB_handler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.tableName)
-        worker.signals.result.connect(self.UpdateTree)
-        worker.signals.finished.connect(self.enableSubmitButton)
-        self.threadpool.start(worker)
+        job = DBHandler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.tableName)
+        job.signals.result.connect(self.update_tree)
+        job.signals.finished.connect(self.enableSubmitButton)
+        self.qu.put(job)
 
     @pyqtSlot(list, list)
-    def UpdateTree(self, col, table):
+    def update_tree(self, col, table):
 
         for c in range(len(col)):
             self.treeWidget.headerItem().setText(c, col[c][0])
@@ -92,10 +138,16 @@ class App(QtWidgets.QWidget):
                 self.treeWidget.topLevelItem(item).setText(value, str(table[item][value]))
 
 
-class DB_handler(QRunnable):
+class WorkerSignals(QObject):
+    result = pyqtSignal(list, list)
+    finished = pyqtSignal()
 
+
+class DBHandler:
+    """
+    Just a regular class that emits signals
+    """
     def __init__(self, fn1=None, fn2=None, tableName=None):
-        super(DB_handler, self).__init__()
         self.signals = WorkerSignals()
         self.tableName = tableName
         self.fn1 = fn1
@@ -105,7 +157,6 @@ class DB_handler(QRunnable):
     def take_input(self, data):
         self.data = data
 
-    @pyqtSlot()
     def run(self):
         col = self.fn1(self.tableName)
         table = self.fn2(self.tableName, self.data)
@@ -113,9 +164,19 @@ class DB_handler(QRunnable):
         self.signals.result.emit(col, table)
 
 
-class WorkerSignals(QObject):
-    result = pyqtSignal(list, list)
-    finished = pyqtSignal()
+class Worker(QThread):
+    def __init__(self, qu, parent=None):
+        super(Worker, self).__init__(parent=parent)
+        self.in_qu = qu
+        self.running = True
+
+    def run(self):
+        while self.running:  # to keep the thread running
+            if not self.in_qu.empty():
+                job = self.in_qu.get()
+                job.run()
+            else:
+                pass
 
 
 if __name__ == '__main__':
