@@ -7,6 +7,7 @@ import DB_manager
 
 class App(QtWidgets.QWidget):
     """docstring for App"""
+    sig = pyqtSignal(dict)
 
     def __init__(self, database, tableName):
         super(App, self).__init__()
@@ -23,20 +24,35 @@ class App(QtWidgets.QWidget):
                        }
 
         self.inputs['sex'].addItems(['M', 'F'])
-        # self.inputs['sex'].currentIndexChanged.connect(self.selectionchange)
+        self.inputs['fname'].editingFinished.connect(self.fname_query)
         self.submitPushButton.clicked.connect(self.Commit)
         self.treeWidget.itemClicked.connect(self.printin)
 
-        self.worke = DB_handler(db=self.dbu, tableName=self.tableName)
-        self.worke.result.connect(self.UpdateTree)
-        self.worke.finished.connect(self.enableSubmitButton)
+        self.worker = DB_handler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.tableName)
+        self.worker.result.connect(self.UpdateTree)
+        self.worker.finished.connect(self.enableSubmitButton)
+
+        self.worker2 = DB_handler(fn1=self.dbu.GetColumns, fn2=self.dbu.Query, tableName=self.tableName)
+        self.worker2.result.connect(self.UpdateTree)
 
         self.submitPushButton.setEnabled(False)
-        self.worke.start()
+        self.worker.start()
 
-    # @pyqtSlot()
-    # def selectionchange(self):
-    #     print(self.inputs['sex'].currentText())
+        self.input_data = {}
+        self.sig.connect(self.worker2.take_input)
+
+    @pyqtSlot()
+    def fname_query(self):
+        print(self.inputs['fname'].text())
+        self.input_data['first_name'] = self.inputs['fname'].text()
+        self.sig.emit(self.input_data)
+        self.worker2.start()
+
+    @pyqtSlot()
+    def selectionchange(self):
+        # print(self.inputs['sex'].currentText())
+        pass
+
     @pyqtSlot(QtWidgets.QTreeWidgetItem, int)
     def printin(self, item, col):
         print(item.text(0))
@@ -54,7 +70,7 @@ class App(QtWidgets.QWidget):
         sex = self.inputs['sex'].currentText()
         age = self.inputs['age'].value()
         self.dbu.AddRecordToTable(self.tableName, (fname, mname, lname, sex, age))
-        self.worke.start()
+        self.worker.start()
 
     @pyqtSlot(list, list)
     def UpdateTree(self, col, table):
@@ -74,14 +90,19 @@ class DB_handler(QThread):
     result = pyqtSignal(list, list)
     finished = pyqtSignal()
 
-    def __init__(self, parent=None, db=None, tableName=None):
+    def __init__(self, parent=None, fn1=None, fn2=None, tableName=None):
         super(DB_handler, self).__init__(parent)
-        self.db = db
         self.tableName = tableName
+        self.fn1 = fn1
+        self.fn2 = fn2
+        self.data = None
+
+    def take_input(self, data):
+        self.data = data
 
     def run(self):
-        col = self.db.GetColumns(self.tableName)
-        table = self.db.GetTable(self.tableName)
+        col = self.fn1(self.tableName)
+        table = self.fn2(self.tableName, self.data)
         self.finished.emit()
         self.result.emit(col, table)
 

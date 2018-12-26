@@ -41,8 +41,7 @@ class DatabaseUtility:
                                                                  ") ENGINE=InnoDB;")
         self.RunCommand(cmd)
 
-    def GetTable(self, tableName):
-        self.CreateTable(tableName)
+    def GetTable(self, tableName, data):
         return self.RunCommand("SELECT * FROM %s;" % tableName)
 
     def GetColumns(self, tableName):
@@ -73,6 +72,13 @@ class DatabaseUtility:
         cmd = " INSERT INTO " + tableName + " (first_name, middle_name, last_name, sex, age)"
         cmd += " VALUES ('%s', '%s', '%s', '%s', '%d');" % data
         self.RunCommand(cmd)
+
+    def Query(self, tableName, data):
+        cmd = "SELECT * FROM " + tableName + " WHERE "
+        for k in data:
+            cmd += k + " LIKE '" + data[k][0] + '_'*(len(data[k])-2) + data[k][-1] + "';"
+
+        return self.RunCommand(cmd)
 
     def __del__(self):
         self.cnx.commit()
