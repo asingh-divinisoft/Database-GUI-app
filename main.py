@@ -1,6 +1,6 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QSizePolicy
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import pyqtSlot
 
 import entry
 import DB_manager
@@ -11,54 +11,41 @@ class Window(QtWidgets.QMainWindow):
         super(Window, self).__init__()
 
         self.db = 'patient_try'
-        self.tableName = 'patient'
+        self.identityTable = 'patient'
+        self.visitTable = 'visits'
         self.dbu = DB_manager.DatabaseUtility(self.db)
 
-        self.stacked_widget = QtWidgets.QStackedWidget()
-        self.button = QtWidgets.QPushButton("Next")
-        self.button2 = QtWidgets.QPushButton("Back")
+        self.queueWidget = QtWidgets.QTreeWidget()
 
-        self.button.clicked.connect(self.__next_page)
-        self.button2.clicked.connect(self.__previous_page)
-
-        btn_widget = QtWidgets.QWidget()
-        layout2 = QtWidgets.QHBoxLayout()
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        layout2.addItem(spacerItem)
-        layout2.addWidget(self.button2)
-        layout2.addWidget(self.button)
-        btn_widget.setLayout(layout2)
-
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.stacked_widget)
-        layout.addWidget(btn_widget)
+        layout = QtWidgets.QHBoxLayout()
+        layout.addWidget(self.queueWidget)
+        layout.addWidget(entry.App(self.dbu, self.identityTable, self.visitTable))
 
         widget = QtWidgets.QWidget()
         widget.setLayout(layout)
         self.setCentralWidget(widget)
 
-        self.stacked_widget.addWidget(entry.App(self.dbu, self.tableName))
-        self.stacked_widget.addWidget(QtWidgets.QLabel("Page 1"))
-        self.stacked_widget.addWidget(QtWidgets.QLabel("Page 2"))
-        self.stacked_widget.addWidget(QtWidgets.QLabel("Page 3"))
+    @pyqtSlot(list, list)
+    def update_tree(self, col, table):
 
-    def __next_page(self):
-        idx = self.stacked_widget.currentIndex()
-        if idx < self.stacked_widget.count() - 1:
-            self.stacked_widget.setCurrentIndex(idx + 1)
-        else:
-            self.stacked_widget.setCurrentIndex(0)
+        for c in range(len(col)):
+            self.queueWidget.headerItem().setText(c, col[c][0])
 
-    def __previous_page(self):
-        idx = self.stacked_widget.currentIndex()
-        if idx > 0:
-            self.stacked_widget.setCurrentIndex(idx - 1)
-        else:
-            self.stacked_widget.setCurrentIndex(self.stacked_widget.count() - 1)
+        self.queueWidget.clear()
+
+        for item in range(len(table)):
+            QtWidgets.QTreeWidgetItem(self.queueWidget)
+            for value in range(len(table[item])):
+                self.queueWidget.topLevelItem(item).setText(value, str(table[item][value]))
+
+    def update_queue(self):
+        job = entry.SimpleHandler(self.dbu, self.identityTable, self.visitTable)
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     w = Window()
     w.show()
-    sys.exit(app.exec_())
+    app.exec_()
+    app.exit()
 

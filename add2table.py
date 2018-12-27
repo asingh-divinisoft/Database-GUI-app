@@ -61,4 +61,5 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     widget = App(db, tableName)
     widget.show()
-    sys.exit(app.exec_())
+    app.exec_()
+    app.exit()

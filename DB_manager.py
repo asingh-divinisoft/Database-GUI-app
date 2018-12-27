@@ -11,6 +11,8 @@ class DatabaseUtility:
         self.cnx = mysql.connector.connect(user='root',
                                            password=p,
                                            host='127.0.0.1')
+
+        self.cnx.autocommit = True
         self.cursor = self.cnx.cursor()
 
         self.ConnectToDatabase()
@@ -81,6 +83,17 @@ class DatabaseUtility:
         cmd = "SELECT * FROM " + tableName + " WHERE " + " AND ".join(cmd) + ";"
 
         return self.RunCommand(cmd)
+
+    def AddToQueue(self, tableName, data):
+        cmd = " INSERT INTO " + tableName + " (p_id) "
+        cmd += "VALUES ('" + data + "');"
+        self.RunCommand(cmd)
+
+    def FetchQueue(self, idTable, visitTable):
+        cmd = f"SELECT p_id AS SNo, CONCAT(first_name, ' ', middle_name, ' ', last_name) AS NAME" \
+              " FROM {idTable}, {visitTable} WHERE ongoing = TRUE" \
+              " AND {idTable}.patient_id = {visitTable}.p_id;"
+        self.RunCommand(cmd)
 
     def __del__(self):
         self.cnx.commit()
