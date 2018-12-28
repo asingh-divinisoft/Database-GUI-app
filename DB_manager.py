@@ -71,29 +71,33 @@ class DatabaseUtility:
         self.RunCommand(cmd)
 
     def AddRecordToTable(self, tableName, data):
-        cmd = " INSERT INTO " + tableName + " (first_name, middle_name, last_name, sex, age)"
+        cmd = f" INSERT INTO {tableName} (first_name, middle_name, last_name, sex, age)"
         cmd += " VALUES ('%s', '%s', '%s', '%s', '%d');" % data
         self.RunCommand(cmd)
 
     def Query(self, tableName, data):
         cmd = []
         for k in data:
-            cmd.append(k + " LIKE '" + data[k] + "%'")
-            # cmd.append(k + " LIKE '" + data[k][0] + '_'*(len(data[k])-2) + data[k][-1] + "'")
-        cmd = "SELECT * FROM " + tableName + " WHERE " + " AND ".join(cmd) + ";"
+            cmd.append(f"{k} LIKE '{data[k]}%'")
+        cmd = f"SELECT * FROM {tableName} WHERE " + " AND ".join(cmd) + ";"
 
         return self.RunCommand(cmd)
 
-    def AddToQueue(self, tableName, data):
-        cmd = " INSERT INTO " + tableName + " (p_id) "
-        cmd += "VALUES ('" + data + "');"
+    def AddToQueue(self, tableName, id, serial):
+        cmd = f" INSERT INTO {tableName} (p_id, serial) "
+        cmd += f"VALUES ('{id}', '{serial}');"
         self.RunCommand(cmd)
 
     def FetchQueue(self, idTable, visitTable):
-        cmd = f"SELECT p_id AS SNo, CONCAT(first_name, ' ', middle_name, ' ', last_name) AS NAME" \
-              " FROM {idTable}, {visitTable} WHERE ongoing = TRUE" \
-              " AND {idTable}.patient_id = {visitTable}.p_id;"
-        self.RunCommand(cmd)
+        cmd = "SELECT serial as No, CONCAT(first_name, ' ', middle_name, ' ', last_name) AS NAME," \
+              f" p_id FROM {idTable}, {visitTable} WHERE ongoing = TRUE" \
+              f" AND {idTable}.patient_id = {visitTable}.p_id" \
+              f" AND DATE(date) = CURRENT_DATE;"
+        return self.RunCommand(cmd)
+
+    def GetTotalVisits(self, visitTable):
+        cmd = f"SELECT COUNT(*) FROM {visitTable} WHERE DATE(date) = CURRENT_DATE;"
+        return self.RunCommand(cmd)
 
     def __del__(self):
         self.cnx.commit()

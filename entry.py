@@ -1,22 +1,26 @@
 import sys
 from PyQt5 import QtWidgets, uic
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, QObject, QThread
+from PyQt5.QtCore import pyqtSlot
 from queue import Queue
 
 import DB_manager
+from utils import SimpleHandler, DBHandler
 
 
-class App(QtWidgets.QWidget):
+class Entry(QtWidgets.QWidget):
     """docstring for App"""
 
-    def __init__(self, database, identityTableName, visitTableName):
-        super(App, self).__init__()
+    def __init__(self, database, id_table_name, visit_table_name, qu=None):
+        super(Entry, self).__init__()
         uic.loadUi('entry.ui', self)
         self.setWindowTitle('APP Pyqt Gui')
+        self.setLayout(self.verticalLayout_3)
         self.dbu = database
-        self.identityTable = identityTableName
-        self.visitTable = visitTableName
+        self.identityTable = id_table_name
+        self.visitTable = visit_table_name
+        self.qu = qu
 
+        self.total_visits = self.dbu.GetTotalVisits(self.visitTable)[0][0]
         self.inputs = {'fname': self.fnameLineEdit,
                        'mname': self.mnameLineEdit,
                        'lname': self.lnameLineEdit,
@@ -33,7 +37,7 @@ class App(QtWidgets.QWidget):
         self.clearPushButton.clicked.connect(self.reset_age)
         self.clearPushButton.clicked.connect(self.reset_sex)
         self.submitPushButton.clicked.connect(self.submit)
-        self.treeWidget.itemClicked.connect(self.saveforqueue)
+        self.treeWidget.itemClicked.connect(self.save_for_queue)
         self.addPushButton.clicked.connect(self.add_to_queue)
 
         self.inputs['fname'].textChanged.connect(self.query)
@@ -45,12 +49,7 @@ class App(QtWidgets.QWidget):
         job = DBHandler(fn1=self.dbu.GetColumns, fn2=self.dbu.GetTable, tableName=self.identityTable)
         job.signals.result.connect(self.update_tree)
         job.signals.finished.connect(self.enableSubmitButton)
-
-        self.qu = Queue()
-        worker = Worker(qu=self.qu, parent=self)
-
         self.qu.put(job)
-        worker.start()
 
     @pyqtSlot()
     def reset_age(self):
@@ -59,6 +58,16 @@ class App(QtWidgets.QWidget):
     @pyqtSlot()
     def reset_sex(self):
         self.inputs['sex'].setCurrentIndex(0)
+
+    @pyqtSlot(QtWidgets.QTreeWidgetItem, int)
+    def save_for_queue(self, item, col):
+        self.patient_id = item.text(0)
+
+    @pyqtSlot()
+    def add_to_queue(self):
+        self.total_visits += 1
+        job = SimpleHandler(self.dbu.AddToQueue, self.visitTable, self.patient_id, self.total_visits)
+        self.qu.put(job)
 
     @pyqtSlot()
     def query(self):
@@ -97,15 +106,6 @@ class App(QtWidgets.QWidget):
             self.qu.put(job)
             self.full_list_present = True
 
-    @pyqtSlot(QtWidgets.QTreeWidgetItem, int)
-    def saveforqueue(self, item, col):
-        self.patient_id = item.text(0)
-
-    @pyqtSlot()
-    def add_to_queue(self):
-        job = SimpleHandler(self.dbu.AddToQueue, self.visitTable, self.patient_id)
-        self.qu.put(job)
-
     @pyqtSlot()
     def enableSubmitButton(self):
         self.submitPushButton.setEnabled(True)
@@ -127,9 +127,9 @@ class App(QtWidgets.QWidget):
         self.qu.put(job2)
         self.full_list_present = False
 
-    @pyqtSlot(list, list)
-    def update_tree(self, col, table):
-
+    @pyqtSlot(list)
+    def update_tree(self, data):
+        col, table = data
         for c in range(len(col)):
             self.treeWidget.headerItem().setText(c, col[c][0])
 
@@ -141,55 +141,6 @@ class App(QtWidgets.QWidget):
                 self.treeWidget.topLevelItem(item).setText(value, str(table[item][value]))
 
 
-class WorkerSignals(QObject):
-    result = pyqtSignal(list, list)
-    finished = pyqtSignal()
-
-
-class SimpleHandler:
-
-    def __init__(self, fn, *args, **kwargs):
-        self.fn = fn
-        self.args = args
-        self.kwargs = kwargs
-
-    def run(self):
-        self.fn(*self.args, **self.kwargs)
-
-
-class DBHandler:
-    """
-    Just a regular class that emits signals
-    """
-    def __init__(self, fn1=None, fn2=None, tableName=None, data=None):
-        self.signals = WorkerSignals()
-        self.tableName = tableName
-        self.fn1 = fn1
-        self.fn2 = fn2
-        self.data = data
-
-    def run(self):
-        col = self.fn1(self.tableName)
-        table = self.fn2(self.tableName, self.data)
-        self.signals.finished.emit()
-        self.signals.result.emit(col, table)
-
-
-class Worker(QThread):
-    def __init__(self, qu, parent=None):
-        super(Worker, self).__init__(parent=parent)
-        self.in_qu = qu
-        self.running = True
-
-    def run(self):
-        while self.running:  # to keep the thread running
-            if not self.in_qu.empty():
-                job = self.in_qu.get()
-                job.run()
-            else:
-                pass
-
-
 if __name__ == '__main__':
 
     db = 'patient_try'
@@ -197,7 +148,8 @@ if __name__ == '__main__':
     visitTable = 'visits'
     dbu = DB_manager.DatabaseUtility(db)
     app = QtWidgets.QApplication(sys.argv)
-    widget = App(dbu, identityTable, visitTable)
+    widget = Entry(dbu, identityTable, visitTable, Queue())
     widget.show()
     app.exec_()
+    dbu.__del__()
     app.exit()

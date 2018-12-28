@@ -1,14 +1,14 @@
 # Clinic Management System
 
-* Need to add a timer which emits a signal at regular intervals.
-* On receiving the signal data from all input fields would be sent to query.
-* And the results will be shown in the treeWidget.
-* Need to add threadpool, because database should be accessed by only one thread at a time.
+* Removed Timer because of unnecessary queries.
+* On receiving the signal data from all input fields would be sent to query. Done
+* And the results will be shown in the treeWidget. Done
+* Need to add queue, because database should be accessed by only one thread at a time. Done
 
 -----
 
 * Need to create a table for patient visits.
-Selecting the patient and clicking a button should add the patient to the queue.
+Selecting the patient and clicking a button should add the patient to the queue. Done
 
 * Method for modifying the queue has to be made.
 
