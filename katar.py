@@ -18,6 +18,7 @@ class Katar(QtWidgets.QWidget):
         self.visit_table = visit_table
         self.qu = qu
         self.setLayout(self.verticalLayout)
+        self.refreshPushButton.clicked.connect(self.update_queue)
         self.update_queue()
 
     @pyqtSlot(list)

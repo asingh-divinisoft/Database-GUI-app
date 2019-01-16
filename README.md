@@ -19,5 +19,5 @@ And also accepts new inputs.
 
 -----
 * Username and password have be secured.
-* Program needs to be compiled or maybe encrpyted.
+* Program needs to be compiled or maybe encrypted.
 * List of requirements has to be made.

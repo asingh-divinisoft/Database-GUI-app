@@ -25,7 +25,6 @@ class Window(QtWidgets.QMainWindow):
         self.katar_app = katar.Katar(self.dbu, self.identityTable, self.visitTable, self.qu)
         self.entry_app = entry.Entry(self.dbu, self.identityTable, self.visitTable, self.qu)
         self.entry_app.addPushButton.clicked.connect(self.katar_app.update_queue)
-        self.katar_app.refreshPushButton.clicked.connect(self.katar_app.update_queue)
 
         layout = QtWidgets.QHBoxLayout()
         layout.addWidget(self.katar_app)
