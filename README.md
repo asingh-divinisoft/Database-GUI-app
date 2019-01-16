@@ -7,7 +7,7 @@
 
 -----
 
-* Need to create a table for patient visits.
+* Need to create a table for patient visits. Done
 Selecting the patient and clicking a button should add the patient to the queue. Done
 
 * Method for modifying the queue has to be made.
@@ -19,5 +19,5 @@ And also accepts new inputs.
 
 -----
 * Username and password have be secured.
-* Program needs to be compiled or maybe encrypted.
+* Program needs to be compiled for windows.
 * List of requirements has to be made.
