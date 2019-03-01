@@ -43,6 +43,9 @@ class Window(QtWidgets.QMainWindow):
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
+    _STYLESHEET = 'style2.qss'
+    with open(_STYLESHEET) as stylesheet:
+        app.setStyleSheet(stylesheet.read())
     w = Window()
     w.show()
     app.exec_()
