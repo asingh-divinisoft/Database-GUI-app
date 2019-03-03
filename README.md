@@ -1,9 +1,12 @@
 # Clinic Management System
 
+![alt text](https://github.com/asaaditya8/Database-GUI-app/blob/master/user.png)
+
 * Removed Timer because of unnecessary queries.
 * On receiving the signal data from all input fields would be sent to query. Done
 * And the results will be shown in the treeWidget. Done
 * Need to add queue, because database should be accessed by only one thread at a time. Done
+* Worker thread needs to be stopped after few seconds. It creates heating issues.
 
 -----
 
