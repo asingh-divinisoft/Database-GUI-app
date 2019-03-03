@@ -1,44 +1,39 @@
-import sys
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
-from queue import Queue
 
-import DB_manager
 from utils import SimpleHandler, DBHandler
 
 
 class Entry(QtWidgets.QWidget):
     """docstring for App"""
 
-    def __init__(self, database, id_table_name, visit_table_name, qu=None):
+    def __init__(self, app=None, database=None, id_table_name=None, visit_table_name=None, qu=None):
         super(Entry, self).__init__()
-        uic.loadUi('entry.ui', self)
-        self.setWindowTitle('APP Pyqt Gui')
-        self.setLayout(self.verticalLayout_3)
+        self.app = app
         self.dbu = database
         self.identityTable = id_table_name
         self.visitTable = visit_table_name
         self.qu = qu
 
         self.total_visits = self.dbu.GetTotalVisits(self.visitTable)[0][0]
-        self.inputs = {'fname': self.fnameLineEdit,
-                       'mname': self.mnameLineEdit,
-                       'lname': self.lnameLineEdit,
-                       'sex': self.sexComboBox,
-                       'age': self.ageSpinBox
+        self.inputs = {'fname': self.app.fnameLineEdit,
+                       'mname': self.app.mnameLineEdit,
+                       'lname': self.app.lnameLineEdit,
+                       'sex': self.app.sexComboBox,
+                       'age': self.app.ageSpinBox
                        }
 
         self.patient_id = None
         self.full_list_present = True
 
-        self.submitPushButton.setEnabled(False)
+        self.app.submitPushButton.setEnabled(False)
         self.inputs['sex'].addItems(['Select', 'M', 'F'])
 
-        self.clearPushButton.clicked.connect(self.reset_age)
-        self.clearPushButton.clicked.connect(self.reset_sex)
-        self.submitPushButton.clicked.connect(self.submit)
-        self.treeWidget.itemClicked.connect(self.save_for_queue)
-        self.addPushButton.clicked.connect(self.add_to_queue)
+        self.app.clearPushButton.clicked.connect(self.reset_age)
+        self.app.clearPushButton.clicked.connect(self.reset_sex)
+        self.app.submitPushButton.clicked.connect(self.submit)
+        self.app.treeWidget.itemClicked.connect(self.save_for_queue)
+        self.app.addPushButton.clicked.connect(self.add_to_queue)
 
         self.inputs['fname'].textChanged.connect(self.query)
         self.inputs['mname'].textChanged.connect(self.query)
@@ -108,11 +103,11 @@ class Entry(QtWidgets.QWidget):
 
     @pyqtSlot()
     def enableSubmitButton(self):
-        self.submitPushButton.setEnabled(True)
+        self.app.submitPushButton.setEnabled(True)
 
     @pyqtSlot()
     def submit(self):
-        self.submitPushButton.setEnabled(False)
+        self.app.submitPushButton.setEnabled(False)
         fname = self.inputs['fname'].text()
         mname = self.inputs['mname'].text()
         lname = self.inputs['lname'].text()
@@ -131,25 +126,15 @@ class Entry(QtWidgets.QWidget):
     def update_tree(self, data):
         col, table = data
         for c in range(len(col)):
-            self.treeWidget.headerItem().setText(c, col[c][0])
+            self.app.treeWidget.headerItem().setText(c, col[c][0])
 
-        self.treeWidget.clear()
+        self.app.treeWidget.clear()
 
         for item in range(len(table)):
-            QtWidgets.QTreeWidgetItem(self.treeWidget)
+            QtWidgets.QTreeWidgetItem(self.app.treeWidget)
             for value in range(len(table[item])):
-                self.treeWidget.topLevelItem(item).setText(value, str(table[item][value]))
+                self.app.treeWidget.topLevelItem(item).setText(value, str(table[item][value]))
 
 
 if __name__ == '__main__':
-
-    db = 'patient_try'
-    identityTable = 'patient'
-    visitTable = 'visits'
-    dbu = DB_manager.DatabaseUtility(db)
-    app = QtWidgets.QApplication(sys.argv)
-    widget = Entry(dbu, identityTable, visitTable, Queue())
-    widget.show()
-    app.exec_()
-    dbu.__del__()
-    app.exit()
+    pass
