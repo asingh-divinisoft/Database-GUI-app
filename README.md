@@ -1,6 +1,6 @@
 # Clinic Management System
 
-![alt text](https://github.com/asaaditya8/Database-GUI-app/blob/master/user.png)
+![alt text](https://github.com/asaaditya8/Database-GUI-app/blob/master/pic.png)
 
 * Removed Timer because of unnecessary queries.
 * On receiving the signal data from all input fields would be sent to query. Done
