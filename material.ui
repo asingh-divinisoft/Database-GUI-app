@@ -11,14 +11,170 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Clinic Manager</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QScrollBar:horizontal {
+	max-height: 20px;
+	background: white;
+	border: 1px transparent grey;
+	margin: 0px 20px 0px 20px;
+}
+QScrollBar:vertical {
+	max-width: 20px;
+	border: 1px transparent grey;
+	margin: 20px 0px 20px 0px;
+	background: white;
+}
+QScrollBar::handle:horizontal {
+	background: rgb(253,253,253);
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(207,207,207);
+	border-radius: 7px;
+	min-width: 25px;
+}
+QScrollBar::handle:horizontal:hover {
+	background: rgb(253,253,253);
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(147, 200, 200);
+	border-radius: 7px;
+	min-width: 25px;
+}
+QScrollBar::handle:vertical {
+	background: rgb(253,253,253);
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(207,207,207);
+	border-radius: 7px;
+	min-height: 25px;
+}
+QScrollBar::handle:vertical:hover {
+	background: rgb(253,253,253);
+	border-style: solid;
+	border-width: 1px;
+	border-color: rgb(147, 200, 200);
+	border-radius: 7px;
+	min-height: 25px;
+}
+QScrollBar::add-line:horizontal {
+   border: 2px transparent grey;
+   border-top-right-radius: 7px;
+   border-bottom-right-radius: 7px;
+   background: rgb(171,171,171);
+   width: 20px;
+   subcontrol-position: right;
+   subcontrol-origin: margin;
+}
+QScrollBar::add-line:horizontal:pressed {
+   border: 2px transparent grey;
+   border-top-right-radius: 7px;
+   border-bottom-right-radius: 7px;
+   background: rgb(191,191,191);
+   width: 20px;
+   subcontrol-position: right;
+   subcontrol-origin: margin;
+}
+QScrollBar::add-line:vertical {
+   border: 2px transparent grey;
+   border-bottom-left-radius: 7px;
+   border-bottom-right-radius: 7px;
+   background: rgb(171,171,171);
+   height: 20px;
+   subcontrol-position: bottom;
+   subcontrol-origin: margin;
+}
+QScrollBar::add-line:vertical:pressed {
+   border: 2px transparent grey;
+   border-bottom-left-radius: 7px;
+   border-bottom-right-radius: 7px;
+   background: rgb(191,191,191);
+   height: 20px;
+   subcontrol-position: bottom;
+   subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal {
+   border: 2px transparent grey;
+   border-top-left-radius: 7px;
+   border-bottom-left-radius: 7px;
+   background: rgb(171,171,171);
+   width: 20px;
+   subcontrol-position: left;
+   subcontrol-origin: margin;
+}
+QScrollBar::sub-line:horizontal:pressed {
+   border: 2px transparent grey;
+   border-top-left-radius: 7px;
+   border-bottom-left-radius: 7px;
+   background: rgb(191,191,191);
+   width: 20px;
+   subcontrol-position: left;
+   subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical {
+   border: 2px transparent grey;
+   border-top-left-radius: 7px;
+   border-top-right-radius: 7px;
+   background: rgb(171,171,171);
+   height: 20px;
+   subcontrol-position: top;
+   subcontrol-origin: margin;
+}
+QScrollBar::sub-line:vertical:pressed {
+   border: 2px transparent grey;
+   border-top-left-radius: 7px;
+   border-top-right-radius: 7px;
+   background: rgb(191,191,191);
+   height: 20px;
+   subcontrol-position: top;
+   subcontrol-origin: margin;
+}
+QScrollBar::left-arrow:horizontal {
+   border: 1px transparent grey;
+   border-top-left-radius: 3px;
+   border-bottom-left-radius: 3px;
+   width: 6px;
+   height: 6px;
+   background: white;
+}
+QScrollBar::right-arrow:horizontal {
+   border: 1px transparent grey;
+   border-top-right-radius: 3px;
+   border-bottom-right-radius: 3px;
+   width: 6px;
+   height: 6px;
+   background: white;
+}
+QScrollBar::up-arrow:vertical {
+   border: 1px transparent grey;
+   border-top-left-radius: 3px;
+   border-top-right-radius: 3px;
+   width: 6px;
+   height: 6px;
+   background: white;
+}
+QScrollBar::down-arrow:vertical {
+   border: 1px transparent grey;
+   border-bottom-left-radius: 3px;
+   border-bottom-right-radius: 3px;
+   width: 6px;
+   height: 6px;
+   background: white;
+}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+   background: white;
+}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+   background: white;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="styleSheet">
     <string notr="true">background-color: rgb(24, 112, 170);</string>
    </property>
    <layout class="QGridLayout" name="gridLayout_5">
-    <item row="0" column="0">
+    <item row="1" column="1">
      <widget class="QFrame" name="frame_3">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -33,7 +189,8 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(33, 150, 233);</string>
+       <string notr="true">background-color: rgb(33, 150, 233);
+border-radius: 8px;</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -42,58 +199,25 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
+       <property name="horizontalSpacing">
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>0</number>
+       </property>
        <property name="bottomMargin">
         <number>9</number>
        </property>
-       <item row="2" column="2">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QPushButton" name="refreshPushButton">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="toolTip">
-            <string>Sync</string>
-           </property>
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset>
-             <normaloff>resources/icons/baseline-sync-white-18/2x/baseline_sync_white_18dp.png</normaloff>resources/icons/baseline-sync-white-18/2x/baseline_sync_white_18dp.png</iconset>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="0" column="2">
         <widget class="QFrame" name="frame_4">
          <property name="styleSheet">
           <string notr="true">background-color: rgb(255, 255, 255);
 color: rgb(66, 66, 66);
-border-radius: 0;</string>
+border: 0px;
+border-top-left-radius: 8;
+border-top-right-radius: 8;
+border-bottom-left-radius: 0;
+border-bottom-right-radius: 0;</string>
          </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -147,11 +271,71 @@ border-radius: 0;</string>
          </layout>
         </widget>
        </item>
+       <item row="3" column="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="refreshPushButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>28</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Sync</string>
+           </property>
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton:hover{
+border-radius: 14px;
+background-color: rgba(255, 255, 255, 100);
+}
+QPushButton:pressed{
+border-radius: 14px;
+background-color: rgba(155, 155, 155, 100);
+}</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>resources/icons/baseline-sync-white-18/2x/baseline_sync_white_18dp.png</normaloff>resources/icons/baseline-sync-white-18/2x/baseline_sync_white_18dp.png</iconset>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item row="1" column="2">
         <widget class="QTreeWidget" name="queueTreeWidget">
          <property name="styleSheet">
           <string notr="true">background-color: rgb(255, 255, 255);
-alternate-background-color: rgb(255, 255, 0, 100);</string>
+alternate-background-color: rgba(255, 255, 0, 100);
+border-radius: 8px;</string>
          </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
@@ -163,13 +347,30 @@ alternate-background-color: rgb(255, 255, 0, 100);</string>
          </column>
         </widget>
        </item>
+       <item row="2" column="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="1" column="2">
      <widget class="QFrame" name="frame_2">
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 255, 255);</string>
+       <string notr="true">background-color: rgb(255, 255, 255);
+border-radius: 8px;</string>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -190,7 +391,8 @@ alternate-background-color: rgb(255, 255, 0, 100);</string>
           <enum>Qt::LeftToRight</enum>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: rgb(255, 255, 0);</string>
+          <string notr="true">background-color: rgb(255, 255, 0);
+border-radius: 8px;</string>
          </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -209,11 +411,27 @@ alternate-background-color: rgb(255, 255, 0, 100);</string>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>28</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="toolTip">
                <string>Clear Fields</string>
               </property>
               <property name="layoutDirection">
                <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string>QPushButton:hover{
+border-radius: 14px;
+background-color: rgba(255, 255, 255, 100);
+}
+QPushButton:pressed{
+border-radius: 14px;
+background-color: rgba(155, 155, 155, 100);
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -238,11 +456,27 @@ alternate-background-color: rgb(255, 255, 0, 100);</string>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>28</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="toolTip">
                <string>Add to Record</string>
               </property>
               <property name="layoutDirection">
                <enum>Qt::RightToLeft</enum>
+              </property>
+              <property name="styleSheet">
+               <string>QPushButton:hover{
+border-radius: 14px;
+background-color: rgba(255, 255, 255, 100);
+}
+QPushButton:pressed{
+border-radius: 14px;
+background-color: rgba(155, 155, 155, 100);
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -703,7 +937,8 @@ color: rgb(125, 125, 0);</string>
          <property name="styleSheet">
           <string notr="true">background-color: rgb(33, 150, 233);
 color: rgb(255, 255, 255);
-border-radius: 0;</string>
+border: 0px;
+border-radius: 8;</string>
          </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -783,11 +1018,24 @@ border-radius: 0;</string>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>28</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="toolTip">
                <string>Add to Queue</string>
               </property>
               <property name="styleSheet">
-               <string notr="true"/>
+               <string notr="true">QPushButton:hover{
+border-radius: 14px;
+background-color: rgba(255, 255, 255, 100);
+}
+QPushButton:pressed{
+border-radius: 14px;
+background-color: rgba(155, 155, 155, 100);
+}</string>
               </property>
               <property name="text">
                <string/>
@@ -806,7 +1054,8 @@ border-radius: 0;</string>
           <item row="0" column="0">
            <widget class="QTreeWidget" name="treeWidget">
             <property name="styleSheet">
-             <string notr="true">alternate-background-color: rgba(36, 168, 255, 100);</string>
+             <string notr="true">alternate-background-color: rgba(36, 168, 255, 50);
+border-radius: 8px;</string>
             </property>
             <property name="alternatingRowColors">
              <bool>true</bool>
@@ -823,6 +1072,70 @@ border-radius: 0;</string>
        </item>
       </layout>
      </widget>
+    </item>
+    <item row="0" column="2">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Preferred</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="3">
+     <spacer name="horizontalSpacer_6">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Preferred</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="1" column="0">
+     <spacer name="horizontalSpacer_5">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Preferred</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="2" column="2">
+     <spacer name="verticalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Preferred</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>10</height>
+       </size>
+      </property>
+     </spacer>
     </item>
    </layout>
   </widget>
